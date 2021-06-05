@@ -1,26 +1,23 @@
-#! /usr/bin/env python3
+# TODO(st9_8) Update comments to be more explicit
 
-# Problem with argument, when an argument started with dash, it causes an error
+from sys import exit
+from configparser import ConfigParser
+from pkg_resources import resource_stream
 
-from models import Documentation, Step
+from njembe import VERSION
+from njembe.models import Documentation, Step
 
 import os
-import sys
+import click
 import logging
-import argparse
 import datetime
-import configparser
 
+@click.group()
+@click.version_option(VERSION)
+def njembe():
+	pass
 
-parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group()
-group.add_argument('-open', action='store_true', help='add new documentation project')
-group.add_argument('-close', action='store_true', help='close the current documentation')
-group.add_argument('-command', nargs='+', dest='command', action='store', help='save the current command')
-parser.add_argument('-list', action='store_true', help='show all saved documentation')
-parser.add_argument('-export', action='store_true', help='export project in a file')
-args = parser.parse_args()
-
+@njembe.command('open')
 def init_doc():
 	"""
 		Initialize a new documentation project.
@@ -29,12 +26,13 @@ def init_doc():
 	query = Documentation.select().where(Documentation.closed==False)
 	if query.exists():
 		logging.error('Can\'t open a new documentation when another one is opened')
-		sys.exit(0)
+		exit(0)
 
 	title = input('Enter the documentation title: ')
 	documentation = Documentation.create(title=title)
-	print('Documentation created')
+	click.echo('Documentation created')
 
+@njembe.command('close')
 def close_doc():
 	"""
 		Close the current documentation project.
@@ -46,8 +44,9 @@ def close_doc():
 	except Documentation.DoesNotExist:
 		logging.info('No project to close')
 
-
-def add_step():
+@njembe.command('command')
+@click.argument('command', nargs=-1, required=True)
+def add_step(command):
 	"""
 		Add a new step to the documentation.
 	"""
@@ -64,7 +63,7 @@ def add_step():
 		logging.info('Document created')
 	
 	
-	step = Step.create(documentation=documentation, command = ' '.join(args.command), position=(documentation.steps + 1))
+	step = Step.create(documentation=documentation, command=' '.join(command), position=(documentation.steps + 1))
 	if os.getenv('EDITOR'):
 		os.system(f'{os.getenv("EDITOR")} {config["DEFAULT"]["working_file"]}')
 		if os.path.exists(config['DEFAULT']['working_file']):
@@ -77,6 +76,7 @@ def add_step():
 	documentation.steps += 1
 	documentation.save()
 
+@njembe.command('list')
 def show_projects():
 	"""
 		Function used to show saved projects of your computer.
@@ -84,13 +84,16 @@ def show_projects():
 	projects = Documentation.select()
 
 	for project in projects:
-		print(f'{project.id}: {project.title} [{"Closed" if project.closed else "Open"}]')
+		click.echo(f'{project.id}: {project.title} [{"Closed" if project.closed else "Open"}]')
 
-def export_project():
+
+@njembe.command('export')
+@click.pass_context
+def export_project(ctx):
 	"""
 		Export specific documentation in a folder
 	"""
-	show_projects()
+	ctx.invoke(show_projects)
 	
 	try:
 		doc_id = int(input('Enter the documentation ID: '))
@@ -122,17 +125,18 @@ def export_project():
 
 			with open(file_to_write, 'w') as doc_file:
 				doc_file.write(doc_to_write)
+		click.echo(f'Documentation available at {file_to_write}')
 
 	except ValueError:
-		print('Wrong value')
+		click.echo('Wrong value')
 		return
 	except Documentation.DoesNotExist:
-		print('This documentation doesn\'t exist')
+		click.echo('This documentation doesn\'t exist')
 
 
 if __name__ == "__main__":
-	config = configparser.ConfigParser()
-	config.read('config.ini')
+	config = ConfigParser()
+	config.read(resource_stream('njembe', 'config.ini').name)
 
 	# Create data folder
 	export_path = config['DEFAULT']['export_folder'].format(os.getenv('HOME'))
@@ -146,16 +150,4 @@ if __name__ == "__main__":
 
 	logging.basicConfig(filename=log_filename, level=logging.ERROR,
                         format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-	if args.open:
-		init_doc()
-	elif args.command:
-		add_step()
-	elif args.close:
-		close_doc()
-	elif args.list:
-		show_projects()
-	elif args.export:
-		export_project()
-	else:
-		parser.print_help()
-		sys.exit(0)
+	njembe(prog_name='njembe')

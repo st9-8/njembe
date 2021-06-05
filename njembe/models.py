@@ -1,9 +1,18 @@
-from peewee import SqliteDatabase, Model, CharField, DateTimeField, TextField, IntegerField, BooleanField, ForeignKeyField
+from peewee import (
+	SqliteDatabase,
+	Model,
+	CharField,
+	DateTimeField,
+	TextField,
+	IntegerField,
+	BooleanField,
+	ForeignKeyField
+)
 
 import datetime
 
 
-db = SqliteDatabase('doc.db')
+db = SqliteDatabase('njembe.db')
 
 class BaseModel(Model):
 	class Meta:
