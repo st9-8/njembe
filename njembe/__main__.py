@@ -1,11 +1,10 @@
 # TODO(st9_8) Update comments to be more explicit
 
 from sys import exit
-from configparser import ConfigParser
-from pkg_resources import resource_stream
 
 from njembe import VERSION
 from njembe.models import Documentation, Step
+from njembe.config import LOG_FILE, WORKING_FILE, EXPORT_FOLDER, EDITOR
 
 import os
 import click
@@ -64,14 +63,17 @@ def add_step(command):
 	
 	
 	step = Step.create(documentation=documentation, command=' '.join(command), position=(documentation.steps + 1))
-	if os.getenv('EDITOR'):
-		os.system(f'{os.getenv("EDITOR")} {config["DEFAULT"]["working_file"]}')
-		if os.path.exists(config['DEFAULT']['working_file']):
-			with open(config['DEFAULT']['working_file']) as tmp:
-				step.description = tmp.read()
-			os.remove(config['DEFAULT']['working_file'])
+	if EDITOR:
+		os.system(f'{EDITOR} {WORKING_FILE}')
 	else:
+		os.system(f'editor {WORKING_FILE}')
 		logging.error('env variable $EDITOR doesn\'t exist, set it to your favorite editor')
+
+	if os.path.exists(WORKING_FILE):
+		with open(WORKING_FILE) as tmp:
+			step.description = tmp.read()
+		os.remove(WORKING_FILE)
+
 	step.save()
 	documentation.steps += 1
 	documentation.save()
@@ -135,18 +137,15 @@ def export_project(ctx):
 
 
 if __name__ == "__main__":
-	config = ConfigParser()
-	config.read(resource_stream('njembe', 'config.ini').name)
-
 	# Create data folder
-	export_path = config['DEFAULT']['export_folder'].format(os.getenv('HOME'))
+	export_path = EXPORT_FOLDER.format(os.getenv('HOME'))
 
 	if not os.path.exists(export_path):
 		os.mkdir(export_path)
 		os.mkdir(os.path.join(export_path, 'logs'))
 
 
-	log_filename = config['DEFAULT']['log_file'].format(os.getenv('HOME'))
+	log_filename = LOG_FILE.format(os.getenv('HOME'))
 
 	logging.basicConfig(filename=log_filename, level=logging.ERROR,
                         format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')

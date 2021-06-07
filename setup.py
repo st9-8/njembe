@@ -25,10 +25,9 @@ setup(
 	],
 	scripts=['./scripts/nj', './scripts/njembe'],
 	packages=find_packages(),
-	package_data={'njembe': ['config.ini', 'njembe.db']},
+	package_data={'njembe': ['njembe.db']},
     install_requires=[
         'peewee',
-        'configparser',
     ],
 	python_requires='>3.6'
 )

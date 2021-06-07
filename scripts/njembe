@@ -1,7 +1,3 @@
 #! /usr/bin/env bash
 
-if [[ ! $@ ]]; then
-	python3 -m njembe
-else
-	python3 -m njembe $@
-fi
+python3 -m njembe $@
