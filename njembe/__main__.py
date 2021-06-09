@@ -3,7 +3,7 @@
 from sys import exit
 
 from njembe import VERSION
-from njembe.models import Documentation, Step
+from njembe.models import Documentation, Step, db
 from njembe.config import LOG_FILE, WORKING_FILE, EXPORT_FOLDER, EDITOR
 
 import os
@@ -102,7 +102,7 @@ def export_project(ctx):
 
 		documentation = Documentation.get_by_id(doc_id)
 		steps = Step.select().where(Step.documentation==doc_id).order_by(Step.position.asc())
-		file_to_write = os.path.join(export_path, f'Documentation_{documentation.id}.nj')
+		file_to_write = os.path.join(EXPORT_FOLDER, f'njembe_doc_{documentation.id}.nj')
 		doc = []
 
 		doc.append(f'Title: {documentation.title}\n')
@@ -138,15 +138,14 @@ def export_project(ctx):
 
 if __name__ == "__main__":
 	# Create data folder
-	export_path = EXPORT_FOLDER.format(os.getenv('HOME'))
 
-	if not os.path.exists(export_path):
-		os.mkdir(export_path)
-		os.mkdir(os.path.join(export_path, 'logs'))
+	if not os.path.exists(EXPORT_FOLDER):
+		os.mkdir(EXPORT_FOLDER)
+		os.mkdir(os.path.join(EXPORT_FOLDER, 'logs'))
+
+		db.create_tables([Documentation, Step])
 
 
-	log_filename = LOG_FILE.format(os.getenv('HOME'))
-
-	logging.basicConfig(filename=log_filename, level=logging.ERROR,
+	logging.basicConfig(filename=LOG_FILE, level=logging.ERROR,
                         format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 	njembe(prog_name='njembe')

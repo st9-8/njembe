@@ -8,11 +8,13 @@ from peewee import (
 	BooleanField,
 	ForeignKeyField
 )
+from njembe.config import EXPORT_FOLDER
 
+import os
 import datetime
 
-
-db = SqliteDatabase('njembe.db')
+dbname = os.path.join(EXPORT_FOLDER, '.njembe.db')
+db = SqliteDatabase(dbname)
 
 class BaseModel(Model):
 	class Meta:
@@ -31,5 +33,3 @@ class Step(BaseModel):
 	command = CharField()
 	description = TextField(null=True)
 	position = IntegerField(default=0)
-
-db.create_tables([Documentation, Step])

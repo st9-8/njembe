@@ -25,7 +25,6 @@ setup(
 	],
 	scripts=['./scripts/nj', './scripts/njembe'],
 	packages=find_packages(),
-	package_data={'njembe': ['njembe.db']},
     install_requires=[
         'peewee',
     ],
