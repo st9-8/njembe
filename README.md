@@ -15,14 +15,14 @@ So that's where **njembe** comes in. **njembe** is a small and simple command li
 - When nothing happens when you type a njembe command, you can check the log file at `$HOME/Documents/njembe/logs/`.
 - Only one documentation can be opened at a moment, so to open another one if one is already opened, you must close the previous one using `nj close` or `njembe close`.
 - All `nj command [ARGUMENTS]` of `nj command [ARGUMENTS]` you type are saving in the current opened documentation.
-- **njembe** respects this [POSIX guidelines](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02), especially the guidelines 10 for command lines arguments including **-**.
+- **njembe** respects this [POSIX guidelines](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02), especially the guidelines 10 for command lines arguments including **-** character at the beginning.
 
 ## Installation
 
 ### From repository
-`git clone https://github.com/st9-8/njembe.git`
-`cd njembe`
-`sudo python3 setup.py install`
+1. `git clone https://github.com/st9-8/njembe.git`
+2. `cd njembe`
+3. `sudo python3 setup.py install`
 
 ### From PyPi
 `pip install njembe`
