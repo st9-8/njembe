@@ -27,6 +27,7 @@ setup(
 	packages=find_packages(),
     install_requires=[
         'peewee',
+        'click'
     ],
 	python_requires='>3.6'
 )
