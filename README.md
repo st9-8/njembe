@@ -33,4 +33,4 @@ So that's where **njembe** comes in. **njembe** is a small and simple command li
 
 You can be face `fatal error: sqlite3.h: No such file or directory`, you can solve it by install **sqlite3 lib** using:
 
-`$ sudo apt install sqlite3 libsqlite3-dev
+`$ sudo apt install sqlite3 libsqlite3-dev`
