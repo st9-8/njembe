@@ -20,10 +20,11 @@ So that's where **njembe** comes in. **njembe** is a small and simple command li
 ## Installation
 
 ### From repository
-1. `git clone https://github.com/st9-8/njembe.git`
-2. `cd njembe`
-3. `sudo apt install libsqlite3-dev`
-4. `sudo python3 setup.py install`
+
+1. `$ git clone https://github.com/st9-8/njembe.git`
+2. `$ cd njembe`
+3. `$ sudo apt install libsqlite3-dev`
+4. `$ sudo python3 setup.py install`
 
 ### From PyPi
 `pip install njembe`
