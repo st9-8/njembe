@@ -138,10 +138,12 @@ def export_project(ctx):
 
 if __name__ == "__main__":
 	# Create data folder
-
-	if not os.path.exists(EXPORT_FOLDER):
-		os.mkdir(EXPORT_FOLDER)
-		os.mkdir(os.path.join(EXPORT_FOLDER, 'logs'))
+	from pathlib import Path
+	
+	export_path = Path(EXPORT_FOLDER)
+	if not export_path.exists():
+		export_path.mkdir(parents=True)
+		(export_path / "logs").mkdir(parents=True)
 
 		db.create_tables([Documentation, Step])
 
