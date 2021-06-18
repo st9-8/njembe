@@ -15,7 +15,7 @@ setup(
 	description=DESCRIPTION,
 	long_description=long_description,
 	long_description_content_type='text/markdown',
-	url='https://github.com/stephane98/njembe',
+	url='https://github.com/st9-8/njembe',
 	classifiers=[
 		"Programming Language :: Python :: 3",
 		"License :: OSI Approved :: MIT License",

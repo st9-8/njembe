@@ -3,6 +3,7 @@
 from sys import exit
 
 from njembe import VERSION
+from njembe.utils import generate_docfile
 from njembe.models import Documentation, Step, db
 from njembe.config import LOG_FILE, WORKING_FILE, EXPORT_FOLDER, EDITOR
 
@@ -11,9 +12,14 @@ import click
 import logging
 import datetime
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
 @click.group()
 @click.version_option(VERSION)
 def njembe():
+	"""
+		A simple tool to help us to document our strong command line processes
+	"""
 	pass
 
 @njembe.command('open')
@@ -81,7 +87,7 @@ def add_step(command):
 @njembe.command('list')
 def show_projects():
 	"""
-		Function used to show saved projects of your computer.
+		Show all availables documentation projects.
 	"""
 	projects = Documentation.select()
 
@@ -89,11 +95,12 @@ def show_projects():
 		click.echo(f'{project.id}: {project.title} [{"Closed" if project.closed else "Open"}]')
 
 
-@njembe.command('export')
+@njembe.command('export', context_settings=CONTEXT_SETTINGS)
+@click.option('-b', '--bash/--no-bash', default=False, help='Export documentation file as executable bash script.')
 @click.pass_context
-def export_project(ctx):
+def export_project(ctx, bash):
 	"""
-		Export specific documentation in a folder
+		Export a specific documentation in njembe folder.
 	"""
 	ctx.invoke(show_projects)
 	
@@ -102,33 +109,8 @@ def export_project(ctx):
 
 		documentation = Documentation.get_by_id(doc_id)
 		steps = Step.select().where(Step.documentation==doc_id).order_by(Step.position.asc())
-		file_to_write = os.path.join(EXPORT_FOLDER, f'njembe_doc_{documentation.id}.nj')
-		doc = []
-
-		doc.append(f'Title: {documentation.title}\n')
-		doc.append(f'Created at: {documentation.created_date.strftime("%d-%m-%Y, %H:%M:%S")}\n')
-		doc.append(f'Steps: {documentation.steps}\n')
-		doc.append(f'{"-"*30}\n\n')
-
-		if steps:
-			
-
-			for step in steps:
-				doc.append(f'Step {step.position}: {step.description}\n')
-				doc.append(f'Command: {step.command}\n')
-				doc.append('\n')
-			doc_to_write = ''.join(doc)
-
-			with open(file_to_write, 'w') as doc_file:
-				doc_file.write(doc_to_write)
-		else:
-			doc.append('No steps in this documentation')
-			doc_to_write = ''.join(doc)
-
-			with open(file_to_write, 'w') as doc_file:
-				doc_file.write(doc_to_write)
-		click.echo(f'Documentation available at {file_to_write}')
-
+		
+		generate_docfile(documentation, steps, bash=bash)
 	except ValueError:
 		click.echo('Wrong value')
 		return
@@ -144,9 +126,13 @@ if __name__ == "__main__":
 	if not export_path.exists():
 		export_path.mkdir(parents=True)
 		(export_path / "logs").mkdir(parents=True)
-
 		db.create_tables([Documentation, Step])
 
+	if not (export_path / "generated_docs").exists():
+		(export_path / "generated_docs").mkdir(parents=True)
+
+	if not (export_path / "generated_scripts").exists():
+		(export_path / "generated_scripts").mkdir(parents=True)		
 
 	logging.basicConfig(filename=LOG_FILE, level=logging.ERROR,
                         format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')

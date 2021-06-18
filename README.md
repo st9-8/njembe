@@ -16,6 +16,7 @@ So that's where **njembe** comes in. **njembe** is a small and simple command li
 - Only one documentation can be opened at a moment, so to open another one if one is already opened, you must close the previous one using `nj close` or `njembe close`.
 - All `nj command [ARGUMENTS]` of `nj command [ARGUMENTS]` you type are saving in the current opened documentation.
 - **njembe** respects this [POSIX guidelines](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02), especially the guidelines 10 for command lines arguments including **-** character at the beginning.
+- You can export your documentation as executable bash scrit using `nj export -b`.
 
 ## Installation
 
